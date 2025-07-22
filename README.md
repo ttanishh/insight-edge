@@ -1,131 +1,144 @@
-# 📈 InsightEdge – Stock Market News Sentiment Analyzer
+# 📈 InsightEdge — Real-Time Financial News Sentiment API
 
-**InsightEdge** is a powerful microservice that scrapes top financial news sources, analyzes headline sentiment, and delivers actionable insights through a blazing-fast REST API built with FastAPI.
+[![Deploy Status](https://img.shields.io/badge/render-live-green)](https://insight-edge-1.onrender.com/)
+[![Python](https://img.shields.io/badge/python-3.10+-blue)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-⚡-green)](https://fastapi.tiangolo.com/)
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue)
-![FastAPI](https://img.shields.io/badge/FastAPI-💚-success)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+**InsightEdge** is a microservice that scrapes real-time financial headlines from multiple trusted sources and performs sentiment analysis to provide market insights.
+
+---
+
+## 🌐 Live API
+
+👉 [https://insight-edge-1.onrender.com](https://insight-edge-1.onrender.com)
 
 ---
 
 ## 🚀 Features
 
-- ✅ Scrapes headlines from top financial news portals:
-  - Yahoo Finance (static)
-  - Google News (dynamic JS-rendered)
-  - Economic Times (interactive form)
-  - CNBC (delayed/lazy-loaded)
-- 🔬 Performs sentiment analysis on headlines using VADER/TextBlob
-- ⚡ Exposes an easy-to-use FastAPI backend with full Swagger documentation
-- 🌐 Designed as a microservice — perfect for integrations or dashboards
+- 🔍 Scrapes top financial news from:
+  - Yahoo Finance (Static)
+  - Google News (Dynamic via JS)
+  - Economic Times (Interactive Forms)
+  - CNBC (Lazy-loaded)
+- 🧠 Performs sentiment analysis using a pre-trained ML model
+- 📊 Returns JSON responses with title, source, link, and sentiment
+- 🔌 FastAPI-powered backend for scalability
 
 ---
 
-## 📦 Project Structure
+## 📂 API Usage
 
-insight-edge/
-├── app/
-│ ├── main.py # FastAPI server + endpoints
-│ ├── scraper.py # News scraping functions
-│ ├── sentiment.py # Sentiment analysis logic
-│ └── utils.py # Helper utilities
-├── requirements.txt # Python dependencies
-├── build.sh # Render deployment script
-└── README.md
-
-yaml
-Copy
-Edit
-
----
-
-## 🧑‍💻 Local Development
-
-### 1. Clone & Install
-
-```bash
-git clone https://github.com/ttanishh/insight-edge.git
-cd insight-edge
-pip install -r requirements.txt
-playwright install
-⚠️ playwright install is required to run dynamic scrapers (like Google News & CNBC)
-
-2. Run API Locally
-bash
-Copy
-Edit
-uvicorn app.main:app --reload
-Visit: http://localhost:8000/docs for Swagger UI.
-
-☁️ Deploy on Render (No Dockerfile)
-Go to https://render.com and click New Web Service
-
-Connect your GitHub repo and use these settings:
-
-Setting	Value
-Build Command	bash build.sh
-Start Command	uvicorn app.main:app --host=0.0.0.0 --port=10000
-Python Version	3.10+ (auto-detected or set via runtime.txt)
-
-Done! Your public API is ready to use. 🎉
-
-🛠 API Usage
-GET / — Health Check
-Returns:
-
-json
-Copy
-Edit
-{ "status": "InsightEdge API is running!" }
+### `GET /`
+Health check route  
+**Response**:
+```json
+{"message": "InsightEdge API is running"}
 GET /headlines
+Fetches top 10 headlines per source with sentiment.
 Query Parameters:
 
-Parameter	Type	Default	Description
-limit	int	10	Max headlines per source
-sources	string	all	Comma-separated: yahoo,google,et,cnbc
+limit (optional): Number of headlines per source (default: 10)
 
 Example:
 
 bash
 Copy
 Edit
-/headlines?limit=5&sources=yahoo,google
-Sample Response:
+GET https://insight-edge-1.onrender.com/headlines?limit=5
+Response:
 
 json
 Copy
 Edit
-[
-  {
-    "source": "yahoo",
-    "headlines": [
-      {
-        "title": "Market rallies after Fed comments",
-        "sentiment": "positive",
-        "score": 0.78
-      }
-    ]
-  }
-]
-🧠 Sentiment Logic
-score > 0.05: positive
+{
+  "Yahoo Finance": [
+    {
+      "title": "S&P 500 hits record high...",
+      "link": "https://finance.yahoo.com/...",
+      "sentiment": "Positive"
+    },
+    ...
+  ],
+  "Google News": [...],
+  ...
+}
+🛠️ Local Development
+1. Clone the repo
+bash
+Copy
+Edit
+git clone https://github.com/ttanishh/insight-edge.git
+cd insight-edge
+2. Create a virtual environment
+bash
+Copy
+Edit
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+3. Install dependencies
+bash
+Copy
+Edit
+pip install -r requirements.txt
+4. Run the app locally
+bash
+Copy
+Edit
+uvicorn app.main:app --reload
+Visit: http://127.0.0.1:8000/docs
 
-score < -0.05: negative
+📖 API Documentation
+Automatically generated Swagger Docs:
+👉 /docs
+👉 /redoc
 
-Otherwise: neutral
+✅ Testing
+Manual Testing
+Use tools like:
 
-Uses NLTK VADER or TextBlob in sentiment.py.
+Postman
 
-🐛 Troubleshooting
-playwright.errors.BrowserError: Run playwright install
+cURL
 
-error: RPC failed on push: retry with stable internet
+FastAPI Swagger UI (/docs)
 
-On Render: make sure port is set to 10000 in Start Command
+Automated Testing (Optional)
+To add unit tests:
 
-📝 License
-MIT © @ttanishh
+Create a file like tests/test_api.py
 
-🙋‍♂️ Author
-Crafted with ❤️ by Tanish Panchal
-GitHub: @ttanishh
+Use pytest and httpx:
+
+bash
+Copy
+Edit
+pip install pytest httpx
+pytest
+Example:
+
+python
+Copy
+Edit
+from fastapi.testclient import TestClient
+from app.main import app
+
+client = TestClient(app)
+
+def test_root():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json() == {"message": "InsightEdge API is running"}
+📦 Deployment (Render)
+This project is deployed using Render.
+
+You can fork and redeploy using:
+
+Build Command: pip install -r requirements.txt
+
+Start Command: uvicorn app.main:app --host=0.0.0.0 --port=10000
+
+Python Version: 3.10+
+
+🤝 Contributing
+Pull requests and issues are welcome. For major changes, please open an issue first to discuss what you would like to change.
